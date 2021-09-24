@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useHistory } from 'react-router';
+import { postUserInfo } from '../api/user';
 import Question from '../components/Question';
 
 const Form = () => {
@@ -79,8 +80,9 @@ const Form = () => {
         onNext={() => setCurrentQuestion(currentQuestion + 1)}
         onBack={() => setCurrentQuestion(currentQuestion - 1)}
         onSubmit={() => {
-          console.log('Send API call');
-          history.push('/');
+          postUserInfo({ name, email, tool, teamSize }).then(() => {
+            history.push('/');
+          });
         }}
         end={currentQuestion === QUESTIONS.length - 1}
         canProgress={QUESTIONS[currentQuestion].canProgress}

@@ -4,9 +4,11 @@ import {
   Route,
   Switch,
 } from 'react-router-dom';
+import dotenv from 'dotenv';
 import Landing from './pages/Landing';
 import Form from './pages/Form';
 function App() {
+  dotenv.config();
   return (
     <Router>
       <Switch>
