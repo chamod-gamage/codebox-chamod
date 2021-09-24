@@ -1,11 +1,13 @@
 import { UserModel } from '../models';
 import nodemailer from 'nodemailer';
 import axios from 'axios';
+import twilio from 'twilio';
 
 export const saveUserInfo = async (req, res) => {
   const user = new UserModel(req.body);
   try {
     let userDoc = await user.save();
+
     let welcomeEmail = await sendMail({
       from: 'CodeBox <chamodgamage26@gmail.com>',
       to: user.email,
@@ -13,6 +15,7 @@ export const saveUserInfo = async (req, res) => {
       text: 'Thank you for expressing your interest in CodeBox!',
       html: '<h1>Thank you for expressing your interest in CodeBox!</h1>',
     });
+
     let founderEmail = await sendMail({
       from: 'CodeBox <chamodgamage26@gmail.com>',
       to: process.env.FOUNDER_EMAIL,
@@ -32,6 +35,7 @@ export const saveUserInfo = async (req, res) => {
         <li>Team Size: ${user.teamSize}</li>
       </ul>`,
     });
+
     let slackResponse = await sendSlack({
       channel: process.env.SLACK_CHANNEL,
       text: `A user has submitted their information on the CodeBox landing page. Here is their information:
@@ -40,11 +44,21 @@ export const saveUserInfo = async (req, res) => {
       - Favourite Source Control Tool: ${user.tool}
       - Team Size: ${user.teamSize}`,
     });
+
+    let message = await sendFounderSMS({
+      text: `A user has submitted their information on the CodeBox landing page. Here is their information:
+    - Name: ${user.name}
+    - Email: ${user.email}
+    - Favourite Source Control Tool: ${user.tool}
+    - Team Size: ${user.teamSize}`,
+    });
+
     res.status(200).json({
       user: userDoc,
       welcomeEmail: welcomeEmail,
       founderEmail: founderEmail,
       slackResponse: slackResponse,
+      message: message,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -75,4 +89,18 @@ const sendSlack = async ({ channel, text }) => {
     { headers: { authorization: `Bearer ${process.env.SLACK_TOKEN}` } }
   );
   return res.data;
+};
+
+const sendFounderSMS = async ({ text }) => {
+  const accountSid = process.env.TWILIO_ACCOUNT_SID;
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
+
+  const client = twilio(accountSid, authToken);
+
+  const message = await client.messages.create({
+    to: process.env.FOUNDER_PHONE_NUMBER,
+    from: process.env.TWILIO_PHONE_NUMBER,
+    body: text,
+  });
+  return message;
 };
