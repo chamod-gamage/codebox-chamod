@@ -8,6 +8,7 @@
 - Node.js API connected to MongoDB database
   - Sends emails to user and founder via Nodemailer
   - Sends message to Slack workspace
+  - Sends SMS messages to founder via Twilio!
 
 ## Technologies Used
 - React
