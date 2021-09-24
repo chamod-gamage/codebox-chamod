@@ -10,6 +10,27 @@ const Form = () => {
   const [teamSize, setTeamSize] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const history = useHistory();
+
+  const handleNext = () => {
+    setCurrentQuestion(currentQuestion + 1);
+  };
+
+  const handleBack = () => {
+    setCurrentQuestion(currentQuestion - 1);
+  };
+
+  const handleEnter = (e) => {
+    if (e.key === 'Enter' && QUESTIONS[currentQuestion].canProgress) {
+      handleNext();
+    }
+  };
+
+  const handleSubmit = async () => {
+    postUserInfo({ name, email, tool, teamSize }).then(() => {
+      history.push('/');
+    });
+  };
+
   const TOOLS = ['Github', 'Gitlab', 'BitBucket', 'TFS', 'Other'];
   const QUESTIONS = [
     {
@@ -19,6 +40,7 @@ const Form = () => {
           className="question-input"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          onKeyPress={handleEnter}
         />
       ),
       canProgress: name.length > 0,
@@ -30,6 +52,7 @@ const Form = () => {
           className="question-input"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          onKeyPress={handleEnter}
         />
       ),
       canProgress:
@@ -44,6 +67,7 @@ const Form = () => {
           className="question-input"
           value={tool}
           onChange={(e) => setTool(e.target.value)}
+          onKeyPress={handleEnter}
         >
           {TOOLS.map((tool) => (
             <option className="question-option" key={tool} value={tool}>
@@ -62,6 +86,7 @@ const Form = () => {
           type="number"
           value={teamSize}
           onChange={(e) => setTeamSize(e.target.value)}
+          onKeyPress={handleEnter}
         />
       ),
       canProgress: teamSize > 0,
@@ -77,13 +102,9 @@ const Form = () => {
       <Question
         index={currentQuestion}
         text={QUESTIONS[currentQuestion].text}
-        onNext={() => setCurrentQuestion(currentQuestion + 1)}
-        onBack={() => setCurrentQuestion(currentQuestion - 1)}
-        onSubmit={() => {
-          postUserInfo({ name, email, tool, teamSize }).then(() => {
-            history.push('/');
-          });
-        }}
+        onNext={handleNext}
+        onBack={handleBack}
+        onSubmit={handleSubmit}
         end={currentQuestion === QUESTIONS.length - 1}
         canProgress={QUESTIONS[currentQuestion].canProgress}
       >
