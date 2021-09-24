@@ -1,5 +1,6 @@
 import { UserModel } from '../models';
 import nodemailer from 'nodemailer';
+import axios from 'axios';
 
 export const saveUserInfo = async (req, res) => {
   const user = new UserModel(req.body);
@@ -31,10 +32,19 @@ export const saveUserInfo = async (req, res) => {
         <li>Team Size: ${user.teamSize}</li>
       </ul>`,
     });
+    let slackResponse = await sendSlack({
+      channel: process.env.SLACK_CHANNEL,
+      text: `A user has submitted their information on the CodeBox landing page. Here is their information:
+      - Name: ${user.name}
+      - Email: ${user.email}
+      - Favourite Source Control Tool: ${user.tool}
+      - Team Size: ${user.teamSize}`,
+    });
     res.status(200).json({
       user: userDoc,
       welcomeEmail: welcomeEmail,
       founderEmail: founderEmail,
+      slackResponse: slackResponse,
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -52,4 +62,17 @@ const sendMail = async ({ from, to, subject, text, html }) => {
   });
   let info = await transporter.sendMail({ from, to, subject, text, html });
   return info.messageId;
+};
+
+const sendSlack = async ({ channel, text }) => {
+  const url = 'https://slack.com/api/chat.postMessage';
+  const res = await axios.post(
+    url,
+    {
+      channel,
+      text,
+    },
+    { headers: { authorization: `Bearer ${process.env.SLACK_TOKEN}` } }
+  );
+  return res.data;
 };
