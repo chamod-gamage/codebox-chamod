@@ -1,0 +1,19 @@
+{
+  "name": "codebox-backend",
+  "version": "1.0.0",
+  "description": "Node.js server for CodeBox",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Chamod Gamage",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.13"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.7"
+  }
+}
