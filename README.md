@@ -17,4 +17,19 @@
 - MongoDB Atlas
 - Nodemailer
 
+## Requirements
+- Node.js v14.X (other versions of Node untested)
+
+## Running
+
+### Frontend
+`cd frontend`
+`npm install`
+`npm start`
+
+### Backend
+`cd backend`
+`npm install`
+`npm start`
+
 ### **Built by Chamod Gamage**
